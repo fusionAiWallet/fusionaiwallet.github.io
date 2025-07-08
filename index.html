@@ -101,8 +101,8 @@
 </div>
 
 <script>
-  console.log("Telegram user:", tg?.initDataUnsafe?.user);
   const tg = window.Telegram?.WebApp || null;
+  console.log("Telegram user:", tg?.initDataUnsafe?.user);
   if (tg) tg.expand();
 
   function nextStep() {
@@ -171,3 +171,4 @@
 </script>
 </body>
 </html>
+
