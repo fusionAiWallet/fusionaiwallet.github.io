@@ -81,7 +81,7 @@
   </div>
 
   <div id="step1">
-    <input type="text" id="telegramUsername" placeholder="@telegram_username" readonly />
+    <input type="text" id="telegram_id" placeholder="telegram_id" readonly />
     <input type="text" id="firstName" placeholder="First Name" required />
     <input type="text" id="surname" placeholder="Surname" required />
     <input type="text" id="phone" placeholder="Phone Number" required />
@@ -102,12 +102,14 @@
 </div>
 
 <script>
+
+  
   const tg = window.Telegram?.WebApp || null;
   if (tg) tg.expand();
 
-  const username = tg?.initDataUnsafe?.user?.username || "unknown";
-  document.getElementById("telegramUsername").value = username ? `@${username}` : "unknown";
-  console.log("Telegram username detected:", username);
+  const telegram_id = tg?.initDataUnsafe?.user?.id || "unknown";
+  document.getElementById("telegramId").value = telegram_id : "unknown";
+  console.log("Telegram username detected:", telegram_id);
 
   function nextStep() {
     const firstName = document.getElementById("firstName").value;
