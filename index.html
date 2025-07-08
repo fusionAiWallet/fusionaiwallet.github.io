@@ -101,6 +101,7 @@
 </div>
 
 <script>
+  console.log("Telegram user:", tg?.initDataUnsafe?.user);
   const tg = window.Telegram?.WebApp || null;
   if (tg) tg.expand();
 
