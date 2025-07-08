@@ -81,6 +81,7 @@
   </div>
 
   <div id="step1">
+    <input type="text" id="telegramUsername" placeholder="@telegram_username" readonly />
     <input type="text" id="firstName" placeholder="First Name" required />
     <input type="text" id="surname" placeholder="Surname" required />
     <input type="text" id="phone" placeholder="Phone Number" required />
@@ -102,8 +103,11 @@
 
 <script>
   const tg = window.Telegram?.WebApp || null;
-  console.log("Telegram user:", tg?.initDataUnsafe?.user);
   if (tg) tg.expand();
+
+  const username = tg?.initDataUnsafe?.user?.username || "unknown";
+  document.getElementById("telegramUsername").value = username ? `@${username}` : "unknown";
+  console.log("Telegram username detected:", username);
 
   function nextStep() {
     const firstName = document.getElementById("firstName").value;
@@ -139,7 +143,7 @@
     const bvn = document.getElementById("bvn").value;
     const pin = document.getElementById("pin").value;
     const confirmPin = document.getElementById("confirmPin").value;
-    const username = tg?.initDataUnsafe?.user?.username || "unknown";
+    const telegram_username = username;
 
     if (!pin || pin.length !== 4 || pin !== confirmPin) {
       document.getElementById("step2Error").innerText = "PINs must match and be 4 digits.";
@@ -155,7 +159,7 @@
           surname: surname,
           phone: phone,
           bvn: bvn,
-          telegram_username: username,
+          telegram_username: telegram_username,
           pin: pin
         })
       });
@@ -171,4 +175,3 @@
 </script>
 </body>
 </html>
-
